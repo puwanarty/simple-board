@@ -1,8 +1,7 @@
-import { redirect } from 'next/navigation';
 import React from 'react';
 
 const Page: React.FC = () => {
-  return redirect('/dashboard');
+  return <div>blog</div>;
 };
 
 export default Page;
