@@ -1,12 +1,12 @@
-import { Comment as IComment } from '@/interfaces';
+import { Comment } from '@/interfaces';
 import dayjs from 'dayjs';
 import React from 'react';
 
 interface Props {
-  comment: IComment;
+  comment: Comment;
 }
 
-const Comment: React.FC<Props> = ({ comment }) => {
+const CommentItem: React.FC<Props> = ({ comment }) => {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2.5">
@@ -21,4 +21,4 @@ const Comment: React.FC<Props> = ({ comment }) => {
   );
 };
 
-export default Comment;
+export default CommentItem;
