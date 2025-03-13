@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/contexts/auth-context';
 import { Post as IPost } from '@/interfaces';
-import { EditIcon, MessageCircleIcon, TrashIcon } from 'lucide-react';
+import { MessageCircleIcon, TrashIcon } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react';
 import EditButton from './edit-button';
@@ -14,8 +14,8 @@ interface Props {
   onDelete: (id: string) => void;
 }
 
-const Post: React.FC<Props> = ({ query, post, onUpdate, onDelete }) => {
-  const { isLoggedIn, user } = useAuth();
+const PostItem: React.FC<Props> = ({ query, post, onUpdate, onDelete }) => {
+  const { user } = useAuth();
 
   const isOwner = user?.sub === post.userId;
 
@@ -64,4 +64,4 @@ const Post: React.FC<Props> = ({ query, post, onUpdate, onDelete }) => {
   );
 };
 
-export default Post;
+export default PostItem;
