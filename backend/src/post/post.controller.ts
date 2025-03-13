@@ -32,7 +32,10 @@ export class PostController {
     const { q, community } = query;
 
     const args: Prisma.PostFindManyArgs = {
-      where: { ...(q && q.length >= 2 && { title: { contains: q, mode: 'insensitive' } }), community: community },
+      where: {
+        ...(q?.length >= 2 && { title: { contains: q, mode: 'insensitive' } }),
+        ...(community && { community }),
+      },
     };
 
     return this.postService.getPosts(args);
@@ -43,7 +46,11 @@ export class PostController {
     const { q, community } = query;
 
     const args: Prisma.PostFindManyArgs = {
-      where: { user: { username: user.username }, title: { contains: q }, community: community },
+      where: {
+        user: { username: user.username },
+        ...(q && q.length >= 2 && { title: { contains: q, mode: 'insensitive' } }),
+        ...(community && { community }),
+      },
     };
 
     return this.postService.getPosts(args);
