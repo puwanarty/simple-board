@@ -8,12 +8,13 @@ import React from 'react';
 import EditButton from './edit-button';
 
 interface Props {
+  query?: string;
   post: IPost;
   onUpdate: () => void;
   onDelete: (id: string) => void;
 }
 
-const Post: React.FC<Props> = ({ post, onUpdate, onDelete }) => {
+const Post: React.FC<Props> = ({ query, post, onUpdate, onDelete }) => {
   const { isLoggedIn, user } = useAuth();
 
   const isOwner = user?.sub === post.userId;
@@ -35,7 +36,23 @@ const Post: React.FC<Props> = ({ post, onUpdate, onDelete }) => {
       <div className="flex flex-col gap-2">
         <div className="rounded-3 bg-surface font-ibm flex w-fit px-2 py-1 text-sm">{post.community}</div>
         <div>
-          <div className="line-clamp-1 font-semibold">{post.title}</div>
+          <div className="line-clamp-1 font-semibold">
+            {query ? (
+              <span>
+                {post.title.split(new RegExp(`(${query})`, 'gi')).map((part, index) =>
+                  part.toLowerCase() === query.toLowerCase() ? (
+                    <mark key={index} className="bg-yellow-300">
+                      {part}
+                    </mark>
+                  ) : (
+                    part
+                  ),
+                )}
+              </span>
+            ) : (
+              post.title
+            )}
+          </div>
           <p className="line-clamp-2 text-sm">{post.content}</p>
         </div>
         <Link href={`/dashboard/${post.id}`} className="flex w-fit items-center gap-1.5 text-gray-300">

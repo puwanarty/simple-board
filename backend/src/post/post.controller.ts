@@ -7,11 +7,11 @@ import {
   Param,
   Post,
   Put,
-  Req,
+  Query,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PostService } from './post.service';
-import { CreatePostDto } from './post.dto';
+import { CreatePostDto, getPostsQuery } from './post.dto';
 import { UserEntity } from 'src/user/user.dto';
 import { User } from 'src/user/user.decorator';
 import { Prisma } from '@prisma/client';
@@ -28,13 +28,23 @@ export class PostController {
 
   @Public()
   @Get()
-  async getPosts() {
-    return this.postService.getPosts();
+  async getPosts(@Query() query: getPostsQuery) {
+    const { q, community } = query;
+
+    const args: Prisma.PostFindManyArgs = {
+      where: { ...(q && q.length >= 2 && { title: { contains: q, mode: 'insensitive' } }), community: community },
+    };
+
+    return this.postService.getPosts(args);
   }
 
   @Get('me')
-  async getPostsByUser(@User() user: UserEntity) {
-    const args: Prisma.PostFindManyArgs = { where: { user: { username: user.username } } };
+  async getPostsByUser(@User() user: UserEntity, @Query() query: getPostsQuery) {
+    const { q, community } = query;
+
+    const args: Prisma.PostFindManyArgs = {
+      where: { user: { username: user.username }, title: { contains: q }, community: community },
+    };
 
     return this.postService.getPosts(args);
   }
