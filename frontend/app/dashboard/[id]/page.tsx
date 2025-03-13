@@ -1,17 +1,17 @@
 'use client';
 
-import { Comment as IComment, Post } from '@/interfaces';
+import CommentItem from '@/components/comment-item';
+import { useAuth } from '@/contexts/auth-context';
+import { Comment, Post } from '@/interfaces';
+import { getCookie } from 'cookies-next';
 import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 import { ArrowLeftIcon, MessageCircleIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import React from 'react';
-import useSWR from 'swr';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '@/contexts/auth-context';
-import { getCookie } from 'cookies-next';
-import Comment from '@/components/comment';
+import useSWR from 'swr';
 
 dayjs.extend(relativeTime);
 
@@ -33,7 +33,7 @@ const Page: React.FC = () => {
     data: comments,
     mutate: commentMutate,
     isLoading: isCommentsLoading,
-  } = useSWR<IComment[]>(`${process.env.NEXT_PUBLIC_API_URL}/post/${id}/comment`, (url: string) =>
+  } = useSWR<Comment[]>(`${process.env.NEXT_PUBLIC_API_URL}/post/${id}/comment`, (url: string) =>
     fetch(url).then((res) => res.json()),
   );
 
@@ -68,7 +68,7 @@ const Page: React.FC = () => {
                 <p className="text-xs text-gray-300">{dayjs(post.createdAt).fromNow()}</p>
               </div>
             </div>
-            <div className="rounded-3 bg-surface font-ibm flex w-fit px-2 py-1">History</div>
+            <div className="rounded-3 bg-surface font-ibm flex w-fit px-2 py-1">{post.community}</div>
           </div>
           <p className="text-3xl font-semibold">{post.title}</p>
           <p className="text-xs">{post.content}</p>
@@ -103,7 +103,7 @@ const Page: React.FC = () => {
             Add Comments
           </button>
         )}
-        {comments && comments.map((comment) => <Comment key={comment.id} comment={comment} />)}
+        {comments && comments.map((comment) => <CommentItem key={comment.id} comment={comment} />)}
       </div>
     </div>
   );
