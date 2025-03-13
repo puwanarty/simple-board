@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Req,
   UnauthorizedException,
 } from '@nestjs/common';
 import { PostService } from './post.service';
@@ -16,6 +17,7 @@ import { User } from 'src/user/user.decorator';
 import { Prisma } from '@prisma/client';
 import { CommentService } from 'src/comment/comment.service';
 import { CreateCommentDto } from 'src/comment/comment.dto';
+import { Public } from 'src/auth/auth.decorator';
 
 @Controller('post')
 export class PostController {
@@ -24,8 +26,14 @@ export class PostController {
     private readonly commentService: CommentService,
   ) {}
 
+  @Public()
   @Get()
-  async getPosts(@User() user: UserEntity) {
+  async getPosts() {
+    return this.postService.getPosts();
+  }
+
+  @Get('me')
+  async getPostsByUser(@User() user: UserEntity) {
     const args: Prisma.PostFindManyArgs = { where: { user: { username: user.username } } };
 
     return this.postService.getPosts(args);
@@ -40,6 +48,7 @@ export class PostController {
     return this.postService.createPost(dto);
   }
 
+  @Public()
   @Get(':id')
   async getPost(@Param('id') id: string) {
     const post = await this.postService.getPost(id);
@@ -49,6 +58,7 @@ export class PostController {
     return post;
   }
 
+  @Public()
   @Get(':id/comment')
   async getComments(@Param('id') id: string) {
     const args: Prisma.CommentFindManyArgs = { where: { postId: id } };

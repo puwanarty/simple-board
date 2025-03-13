@@ -7,11 +7,18 @@ export class CommentService {
   constructor(private prisma: PrismaService) {}
 
   async getComments(args: Prisma.CommentFindManyArgs) {
-    return this.prisma.comment.findMany(args);
+    return this.prisma.comment.findMany({
+      ...args,
+      orderBy: { createdAt: 'desc' },
+      include: { user: { select: { username: true } } },
+    });
   }
 
   async getComment(id: string) {
-    return this.prisma.comment.findUnique({ where: { id } });
+    return this.prisma.comment.findUnique({
+      where: { id },
+      include: { user: { select: { username: true } } },
+    });
   }
 
   async createComment(data: Prisma.CommentCreateInput) {

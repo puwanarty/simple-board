@@ -1,5 +1,6 @@
 'use client';
 
+import { useAuth } from '@/contexts/auth-context';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -8,11 +9,14 @@ interface FormValues {
 }
 
 const Page: React.FC = () => {
-  const { register, handleSubmit } = useForm<FormValues>();
+  const { login } = useAuth();
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, isValid },
+  } = useForm<FormValues>();
 
-  const onSubmit = (data: FormValues) => {
-    alert(JSON.stringify(data));
-  };
+  const onSubmit = async (data: FormValues) => login(data.username);
 
   return (
     <div className="flex h-screen flex-col bg-green-500 sm:flex-row-reverse">
@@ -27,9 +31,13 @@ const Page: React.FC = () => {
             type="text"
             placeholder="Username"
             className="rounded-2 border bg-gray-50 px-3.5 py-2.5"
-            {...register}
+            {...register('username', { required: true })}
           />
-          <button type="submit" className="rounded-2 bg-success px-3.5 py-2.5 text-sm font-semibold text-white">
+          <button
+            disabled={!isValid || isSubmitting}
+            type="submit"
+            className="rounded-2 bg-success px-3.5 py-2.5 text-sm font-semibold text-white"
+          >
             Sign In
           </button>
         </form>

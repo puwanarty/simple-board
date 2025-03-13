@@ -3,6 +3,7 @@
 import Sidebar from '@/components/sidebar';
 import { useAuth } from '@/contexts/auth-context';
 import { AlignJustifyIcon, ArrowRight } from 'lucide-react';
+import { redirect, RedirectType } from 'next/navigation';
 import React from 'react';
 
 interface LayoutProps {
@@ -10,7 +11,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { isLoggedIn, login, logout } = useAuth();
+  const { isLoggedIn, user } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -21,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         <p className="font-castoro text-2xl text-white italic">a Board</p>
         {isLoggedIn ? (
           <div className="flex items-center gap-5">
-            <p className="font-medium text-white">Jessica</p>
+            <p className="font-medium text-white">{user?.username}</p>
             <img src="/avatar.png" alt="user" className="h-10 w-10 rounded-full" />
             <button onClick={toggleSidebar} className="sm:hidden">
               <AlignJustifyIcon size={24} className="text-white" />
@@ -30,7 +31,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         ) : (
           <button
             className="rounded-2 bg-success font-ibm px-7 py-2.5 text-sm font-semibold text-white"
-            onClick={login}
+            onClick={() => redirect('/sign-in', RedirectType.push)}
           >
             Sign In
           </button>

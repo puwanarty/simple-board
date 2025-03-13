@@ -14,7 +14,9 @@ export class UserService {
     return this.prisma.user.create({ data });
   }
 
-  async seed(): Promise<User> {
-    return this.prisma.user.create({ data: { username: 'admin' } });
+  async seed(): Promise<User[]> {
+    const users = [{ username: 'admin' }, { username: 'johndoe' }, { username: 'janedoe' }];
+    await this.prisma.user.createMany({ data: users });
+    return this.prisma.user.findMany({ where: { username: { in: ['admin', 'johndoe', 'janedoe'] } } });
   }
 }

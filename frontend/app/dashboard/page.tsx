@@ -1,8 +1,30 @@
-import { ChevronDown, MessageCircleIcon } from 'lucide-react';
-import Link from 'next/link';
+'use client';
+
+import CreateButton from '@/components/create-button';
+import Post from '@/components/post';
+import { Post as IPost } from '@/interfaces';
+import { getCookie } from 'cookies-next';
 import React from 'react';
+import useSWR from 'swr';
 
 const Page: React.FC = () => {
+  const {
+    data: posts,
+    mutate,
+    isLoading,
+  } = useSWR<IPost[]>(`${process.env.NEXT_PUBLIC_API_URL}/post`, (url: string) => fetch(url).then((res) => res.json()));
+
+  const handleDelete = async (id: string) => {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/post/${id}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getCookie('access_token')}` },
+    });
+
+    if (response.ok) {
+      mutate();
+    }
+  };
+
   return (
     <div className="mx-auto flex max-w-3xl flex-1 flex-col gap-6 p-4 sm:p-8">
       <div className="flex justify-between gap-5">
@@ -18,37 +40,11 @@ const Page: React.FC = () => {
             <option value="community">Community</option>
             <option value="community">Community</option>
           </select>
-          <button className="rounded-2 bg-success font-ibm px-6 py-2.5 text-sm font-semibold text-white">
-            Create +
-          </button>
+          <CreateButton onCreate={mutate} />
         </div>
       </div>
-      <div className="rounded-3 border border-gray-100 bg-white p-5">
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2.5">
-            <img src="/avatar.png" alt="avatar" className="h-8 w-8" />
-            <p className="font-medium text-gray-300">Jessica</p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <div className="rounded-3 bg-surface font-ibm flex w-fit px-2 py-1">History</div>
-            <div>
-              <Link href="/dashboard/1" className="line-clamp-1 font-semibold">
-                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Quasi facere, in reprehenderit quis laboriosam
-                rerum ut, itaque voluptates, eaque laudantium quibusdam perferendis dolor deleniti tenetur voluptas
-                error eum aut delectus?
-              </Link>
-              <p className="line-clamp-2 text-sm">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Itaque, delectus veniam odio magnam consequatur
-                deleniti vitae blanditiis iusto at in eveniet iure harum quos. Perspiciatis, eveniet quae! Et, inventore
-                iste!
-              </p>
-            </div>
-            <button className="flex items-center gap-1.5 text-gray-300">
-              <MessageCircleIcon size={16} />
-              <span>30 Comments</span>
-            </button>
-          </div>
-        </div>
+      <div className="rounded-3 divide-y divide-gray-100 border border-gray-100 bg-white">
+        {posts && posts.map((post) => <Post key={post.id} post={post} onDelete={handleDelete} onUpdate={mutate} />)}
       </div>
     </div>
   );

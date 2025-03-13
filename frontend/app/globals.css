@@ -36,3 +36,9 @@
     cursor: pointer;
   }
 }
+
+@layer base {
+  :disabled {
+    opacity: 0.5;
+  }
+}

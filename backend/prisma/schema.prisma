@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Community {
+  HISTORY
+  FOOD
+  OTHER
+}
+
 model User {
   id        String    @id @default(cuid())
   username  String    @unique
@@ -26,6 +32,7 @@ model Post {
   id        String    @id @default(cuid())
   title     String
   content   String
+  community Community
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   userId    String

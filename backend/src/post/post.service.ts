@@ -10,12 +10,25 @@ export class PostService {
     private userService: UserService,
   ) {}
 
-  async getPosts(args: Prisma.PostFindManyArgs) {
-    return this.prisma.post.findMany(args);
+  async getPosts(args?: Prisma.PostFindManyArgs) {
+    return this.prisma.post.findMany({
+      ...args,
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: { username: true } },
+        comments: { select: { id: true, content: true, createdAt: true, user: { select: { username: true } } } },
+      },
+    });
   }
 
   async getPost(id: string) {
-    return this.prisma.post.findUnique({ where: { id } });
+    return this.prisma.post.findUnique({
+      where: { id },
+      include: {
+        user: { select: { username: true } },
+        comments: { select: { id: true, content: true, createdAt: true, user: { select: { username: true } } } },
+      },
+    });
   }
 
   async createPost(data: Prisma.PostCreateInput) {
