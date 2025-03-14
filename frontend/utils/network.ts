@@ -19,15 +19,17 @@ const fetcher = async (url: string, options?: RequestInit) => {
   }
 };
 
-const getToken = () => {
-  const token = getCookie('access_token');
-
-  if (!token) throw new Error('Unauthorized');
-
-  return token;
-};
+const getToken = () => getCookie('access_token');
 
 export const get = <T>(url: string) => useSWR<T, ErrorResult>(url, fetcher);
+
+export const getWithToken = <T>(url: string) => {
+  const token = getToken();
+
+  return useSWR<T, ErrorResult>(url, () =>
+    fetcher(url, { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } }),
+  );
+};
 
 export const post = async <T, D>(url: string, data: D): Promise<T | ErrorResult> => {
   const token = getToken();

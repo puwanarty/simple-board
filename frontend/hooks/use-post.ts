@@ -1,5 +1,5 @@
 import { Comment, CreateComment, CreatePost, Post, UpdatePost } from '@/interfaces';
-import { del, get, post, put } from '@/utils/network';
+import { del, get, getWithToken, post, put } from '@/utils/network';
 
 const usePost = () => {
   const buildQueryString = (query: string, community: string) =>
@@ -9,7 +9,7 @@ const usePost = () => {
     get<Post[]>(`${process.env.NEXT_PUBLIC_API_URL}/post?${buildQueryString(query, community)}`);
 
   const getMyPosts = (query: string, community: string) =>
-    get<Post[]>(`${process.env.NEXT_PUBLIC_API_URL}/post/me?${buildQueryString(query, community)}`);
+    getWithToken<Post[]>(`${process.env.NEXT_PUBLIC_API_URL}/post/me?${buildQueryString(query, community)}`);
 
   const getPost = (id: string) => get<Post>(`${process.env.NEXT_PUBLIC_API_URL}/post/${id}`);
 
