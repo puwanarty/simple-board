@@ -2,10 +2,10 @@
 
 import { useAuth } from '@/contexts/auth-context';
 import { Community } from '@/enums';
-import { Post } from '@/interfaces';
-import { getCookie } from 'cookies-next';
+import usePost from '@/hooks/use-post';
+import { Post, UpdatePost } from '@/interfaces';
 import { EditIcon, XIcon } from 'lucide-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 interface Props {
@@ -13,25 +13,22 @@ interface Props {
   onUpdate: () => void;
 }
 
-interface FormValues {
-  title: string;
-  content: string;
-  community: Community;
-}
-
 const EditButton: React.FC<Props> = ({ post, onUpdate }) => {
   const { isLoggedIn } = useAuth();
+  const { updatePost } = usePost();
 
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const handleOpen = () => setIsOpen(!isOpen);
+  const openPost = () => setIsOpen(true);
+  const closePost = () => setIsOpen(false);
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { isValid, isSubmitting },
-  } = useForm<FormValues>({
+    setError,
+    formState: { isValid, isSubmitting, errors },
+  } = useForm<UpdatePost>({
     defaultValues: {
       title: post.title,
       content: post.content,
@@ -39,22 +36,22 @@ const EditButton: React.FC<Props> = ({ post, onUpdate }) => {
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/post/${post.id}`, {
-      method: 'Put',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${getCookie('access_token')}`,
-      },
-      body: JSON.stringify(data),
-    });
+  const onSubmit = async (data: UpdatePost) => {
+    const response = await updatePost(post.id, data);
 
-    if (response.ok) {
-      reset();
-      handleOpen();
+    if ('error' in response) {
+      setError('root', { message: response.message[0] });
+    }
+
+    if ('id' in response) {
       onUpdate();
+      closePost();
     }
   };
+
+  useEffect(() => {
+    reset();
+  }, [isOpen]);
 
   return (
     <React.Fragment>
@@ -64,7 +61,7 @@ const EditButton: React.FC<Props> = ({ post, onUpdate }) => {
             className="rounded-3 relative flex w-full max-w-2xl flex-col gap-7 bg-white px-4 py-8"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <XIcon className="absolute top-4 right-4 h-6 w-6 cursor-pointer" onClick={handleOpen} />
+            <XIcon className="absolute top-4 right-4 h-6 w-6 cursor-pointer" onClick={closePost} />
             <p className="text-2xl font-semibold">Edit Post</p>
             <div className="flex flex-col gap-2.5">
               <select
@@ -87,6 +84,7 @@ const EditButton: React.FC<Props> = ({ post, onUpdate }) => {
                 {...register('content', { required: true })}
               />
             </div>
+            {errors.root && <p className="text-sm text-red-500 italic">{errors.root.message}</p>}
             <button
               type="submit"
               disabled={!isValid || isSubmitting}
@@ -97,7 +95,7 @@ const EditButton: React.FC<Props> = ({ post, onUpdate }) => {
           </form>
         </div>
       )}
-      <button onClick={handleOpen} disabled={!isLoggedIn}>
+      <button onClick={openPost} disabled={!isLoggedIn}>
         <EditIcon size={20} />
       </button>
     </React.Fragment>

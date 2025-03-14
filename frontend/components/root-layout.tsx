@@ -26,7 +26,9 @@ interface RootLayoutProps {
 const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   return (
     <AuthProvider>
-      <body className={`${inter.className} ${castoro.variable} ${ibm.variable} antialiased`}>{children}</body>
+      <body className={`${inter.className} ${castoro.variable} ${ibm.variable} antialiased`} suppressHydrationWarning>
+        {children}
+      </body>
     </AuthProvider>
   );
 };

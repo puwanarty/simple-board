@@ -2,51 +2,49 @@
 
 import { useAuth } from '@/contexts/auth-context';
 import { Community } from '@/enums';
-import { getCookie } from 'cookies-next';
+import usePost from '@/hooks/use-post';
+import { CreatePost } from '@/interfaces';
 import { XIcon } from 'lucide-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 interface Props {
   onCreate: () => void;
 }
 
-interface FormValues {
-  title: string;
-  content: string;
-  community: Community;
-}
-
 const CreateButton: React.FC<Props> = ({ onCreate }) => {
   const { isLoggedIn } = useAuth();
+  const { createPost } = usePost();
 
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const handleOpen = () => setIsOpen(!isOpen);
+  const openPost = () => setIsOpen(true);
+  const closePost = () => setIsOpen(false);
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { isValid, isSubmitting },
-  } = useForm<FormValues>();
+    setError,
+    formState: { isValid, isSubmitting, errors },
+  } = useForm<CreatePost>();
 
-  const onSubmit = async (data: FormValues) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/post`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${getCookie('access_token')}`,
-      },
-      body: JSON.stringify(data),
-    });
+  const onSubmit = async (data: CreatePost) => {
+    const response = await createPost(data);
 
-    if (response.ok) {
-      reset();
-      handleOpen();
+    if ('error' in response) {
+      setError('root', { message: response.message[0] });
+    }
+
+    if ('id' in response) {
       onCreate();
+      closePost();
     }
   };
+
+  useEffect(() => {
+    reset();
+  }, [isOpen]);
 
   return (
     <React.Fragment>
@@ -56,7 +54,7 @@ const CreateButton: React.FC<Props> = ({ onCreate }) => {
             className="rounded-3 relative flex w-full max-w-2xl flex-col gap-7 bg-white px-4 py-8"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <XIcon className="absolute top-4 right-4 h-6 w-6 cursor-pointer" onClick={handleOpen} />
+            <XIcon className="absolute top-4 right-4 h-6 w-6 cursor-pointer" onClick={closePost} />
             <p className="text-2xl font-semibold">Create Post</p>
             <div className="flex flex-col gap-2.5">
               <select
@@ -79,6 +77,7 @@ const CreateButton: React.FC<Props> = ({ onCreate }) => {
                 {...register('content', { required: true })}
               />
             </div>
+            {errors.root && <p className="text-sm text-red-500 italic">{errors.root.message}</p>}
             <button
               type="submit"
               disabled={!isValid || isSubmitting}
@@ -90,7 +89,7 @@ const CreateButton: React.FC<Props> = ({ onCreate }) => {
         </div>
       )}
       <button
-        onClick={handleOpen}
+        onClick={openPost}
         disabled={!isLoggedIn}
         className="rounded-2 bg-success font-ibm px-6 py-2.5 text-sm font-semibold text-white"
       >

@@ -12,18 +12,18 @@ interface Props {
   handleQuery: (query: string) => void;
   community: Community | '';
   handleCommunity: (community: Community) => void;
-  refetch: () => void;
+  refresh: () => void;
   posts: Post[];
 }
 
-const PostSection: React.FC<Props> = ({ query, handleQuery, community, handleCommunity, refetch, posts }) => {
+const PostSection: React.FC<Props> = ({ query, handleQuery, community, handleCommunity, refresh, posts }) => {
   const handleDelete = async (id: string) => {
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/post/${id}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getCookie('access_token')}` },
     });
 
-    if (response.ok) refetch();
+    if (response.ok) refresh();
   };
 
   return (
@@ -47,17 +47,17 @@ const PostSection: React.FC<Props> = ({ query, handleQuery, community, handleCom
             <option value={Community.FOOD}>Food</option>
             <option value={Community.OTHER}>Other</option>
           </select>
-          <CreateButton onCreate={refetch} />
+          <CreateButton onCreate={refresh} />
         </div>
       </div>
       <div className="rounded-3 divide-y divide-gray-100 border border-gray-100 bg-white">
-        {posts &&
+        {posts.length > 0 &&
           posts.map((post) => (
             <PostItem
               key={post.id}
               post={post}
               onDelete={handleDelete}
-              onUpdate={refetch}
+              onUpdate={refresh}
               query={query.length >= 2 ? query : ''}
             />
           ))}
