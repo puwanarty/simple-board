@@ -35,3 +35,5 @@ export interface CreatePost extends Pick<Post, 'title' | 'content' | 'community'
 export interface UpdatePost extends CreatePost {}
 
 export interface CreateComment extends Pick<Comment, 'content'> {}
+
+export interface UpdateComment extends CreateComment {}

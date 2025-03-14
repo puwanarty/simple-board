@@ -78,7 +78,7 @@ const Page: React.FC = () => {
         </div>
         <div className="flex items-center gap-1.5 text-gray-300">
           <MessageCircleIcon size={16} />
-          {post.comments.length > 0 && <span>{post.comments.length} Comments</span>}
+          {comments && comments.length > 0 && <span>{comments.length} Comments</span>}
         </div>
         {isCommentsOpen ? (
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -112,7 +112,10 @@ const Page: React.FC = () => {
             Add Comments
           </button>
         )}
-        {comments && comments.map((comment) => <CommentItem key={comment.id} comment={comment} />)}
+        {comments &&
+          comments.map((comment) => (
+            <CommentItem key={comment.id} comment={comment} refreshComments={refreshComments} />
+          ))}
       </div>
     </div>
   );

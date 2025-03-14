@@ -1,4 +1,4 @@
-import { Comment, CreateComment, CreatePost, Post, UpdatePost } from '@/interfaces';
+import { Comment, CreateComment, CreatePost, Post, UpdateComment, UpdatePost } from '@/interfaces';
 import { del, get, getWithToken, post, put } from '@/utils/network';
 
 const usePost = () => {
@@ -23,9 +23,26 @@ const usePost = () => {
   const updatePost = (id: string, data: UpdatePost) =>
     put<Post, UpdatePost>(`${process.env.NEXT_PUBLIC_API_URL}/post/${id}`, data);
 
+  const updateComment = (postId: string, id: string, data: UpdateComment) =>
+    put<Comment, UpdateComment>(`${process.env.NEXT_PUBLIC_API_URL}/post/${postId}/comment/${id}`, data);
+
   const removePost = (id: string) => del<Post>(`${process.env.NEXT_PUBLIC_API_URL}/post/${id}`);
 
-  return { getPosts, getMyPosts, getPost, getComments, createPost, createComment, updatePost, removePost };
+  const removeComment = (postId: string, id: string) =>
+    del<Comment>(`${process.env.NEXT_PUBLIC_API_URL}/post/${postId}/comment/${id}`);
+
+  return {
+    getPosts,
+    getMyPosts,
+    getPost,
+    getComments,
+    createPost,
+    createComment,
+    updatePost,
+    updateComment,
+    removePost,
+    removeComment,
+  };
 };
 
 export default usePost;
