@@ -3,6 +3,7 @@
 import CreateButton from '@/components/create-button';
 import PostItem from '@/components/post-item';
 import { Community } from '@/enums';
+import usePost from '@/hooks/use-post';
 import { Post } from '@/interfaces';
 import { getCookie } from 'cookies-next';
 import React from 'react';
@@ -17,13 +18,25 @@ interface Props {
 }
 
 const PostSection: React.FC<Props> = ({ query, handleQuery, community, handleCommunity, refresh, posts }) => {
-  const handleDelete = async (id: string) => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/post/${id}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getCookie('access_token')}` },
-    });
+  const { removePost } = usePost();
 
-    if (response.ok) refresh();
+  const handleDelete = async (id: string) => {
+    const response = await removePost(id);
+
+    if ('error' in response) {
+      console.error(response.error);
+      return;
+    }
+
+    if ('id' in response) {
+      refresh;
+    }
+
+    // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/post/${id}`, {
+    //   method: 'DELETE',
+    //   headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${getCookie('access_token')}` },
+    // });
+    // if (response.ok) refresh();
   };
 
   return (
