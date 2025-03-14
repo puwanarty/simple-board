@@ -3,6 +3,7 @@
 import CommentItem from '@/components/comment-item';
 import { useAuth } from '@/contexts/auth-context';
 import usePost from '@/hooks/use-post';
+import { CreateComment } from '@/interfaces';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { ArrowLeftIcon, MessageCircleIcon } from 'lucide-react';
@@ -22,7 +23,7 @@ const Page: React.FC = () => {
     reset,
     setError,
     formState: { isValid, isSubmitting, errors },
-  } = useForm<{ content: string }>();
+  } = useForm<CreateComment>();
   const [isCommentsOpen, setIsCommentsOpen] = React.useState(false);
 
   const openComments = () => setIsCommentsOpen(true);
@@ -33,8 +34,8 @@ const Page: React.FC = () => {
   const { data: post, mutate: refreshPost, isLoading: isPostLoading } = getPost(id as string);
   const { data: comments, mutate: refreshComments, isLoading: isCommentLoading } = getComments(id as string);
 
-  const onSubmit = async (data: { content: string }) => {
-    const response = await createComment(id as string, data.content);
+  const onSubmit = async (data: CreateComment) => {
+    const response = await createComment(id as string, data);
 
     if ('error' in response) {
       setError('content', { message: response.message[0] });
