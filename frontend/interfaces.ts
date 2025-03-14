@@ -29,3 +29,7 @@ export interface Comment {
   user: User;
   post: Post;
 }
+
+export interface CreatePost extends Pick<Post, 'title' | 'content' | 'community'> {}
+
+export interface UpdatePost extends CreatePost {}
