@@ -107,13 +107,15 @@ export class PostController {
 
   @Put(':id/comment/:commentId')
   async updateComment(@User() user: UserEntity, @Body() data: CreateCommentDto, @Param('commentId') commentId: string) {
+    const { content } = data;
+
     const comment = await this.commentService.getComment(commentId);
 
     if (!comment) throw new NotFoundException();
 
     if (comment.userId !== user.sub) throw new UnauthorizedException();
 
-    const dto: Prisma.CommentUpdateInput = { ...data };
+    const dto: Prisma.CommentUpdateInput = { content };
 
     return this.commentService.updateComment(commentId, dto);
   }
