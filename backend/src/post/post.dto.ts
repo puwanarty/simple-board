@@ -1,13 +1,15 @@
 import { Community } from '@prisma/client';
-import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class CreatePostDto {
   @IsNotEmpty()
   @IsString()
+  @MaxLength(25)
   title: string;
 
   @IsNotEmpty()
   @IsString()
+  @MaxLength(255)
   content: string;
 
   @IsNotEmpty()
