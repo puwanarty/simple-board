@@ -12,12 +12,12 @@ import {
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto, getPostsQuery } from './post.dto';
-import { UserEntity } from 'src/user/user.dto';
-import { User } from 'src/user/user.decorator';
+import { UserEntity } from '../user/user.dto';
+import { User } from '../user/user.decorator';
 import { Prisma } from '@prisma/client';
-import { CommentService } from 'src/comment/comment.service';
-import { CreateCommentDto } from 'src/comment/comment.dto';
-import { Public } from 'src/auth/auth.decorator';
+import { CommentService } from '../comment/comment.service';
+import { CreateCommentDto } from '../comment/comment.dto';
+import { Public } from '../auth/auth.decorator';
 
 @Controller('post')
 export class PostController {
@@ -33,7 +33,7 @@ export class PostController {
 
     const args: Prisma.PostFindManyArgs = {
       where: {
-        ...(q?.length >= 2 && { title: { contains: q, mode: 'insensitive' } }),
+        ...(q && q.length >= 2 && { title: { contains: q, mode: 'insensitive' } }),
         ...(community && { community }),
       },
     };

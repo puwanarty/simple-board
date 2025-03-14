@@ -20,9 +20,9 @@ export class CreatePostDto {
 export class getPostsQuery {
   @IsOptional()
   @IsString()
-  q: string;
+  q?: string;
 
   @IsOptional()
   @IsEnum([Community.FOOD, Community.HISTORY, Community.OTHER])
-  community: Community;
+  community?: Community;
 }
